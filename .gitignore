@@ -1,0 +1,11 @@
+# Editors.
+*.sw*
+.vscode
+.DS_Store
+.idea/*
+./cmake/*
+cmake-*
+
+# Build directory.
+build/
+out/

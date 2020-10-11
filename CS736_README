@@ -1,0 +1,89 @@
+Getting Started
+
+To compile Bourbon, cmake (>= 3.7) is required. You may follow the instructions on this website to
+download and install cmake.
+
+https://cmake.org/install/
+
+After installing cmake, you can compile Bourbon via the following:
+```
+mkdir build
+cd build
+cmake /path/to/bourbon -DCMAKE_BUILD_TYPE=RELEASE -DNDEBUG_SWITCH=ON
+make -j
+```
+
+
+Code
+
+Bourbon is modified upon LevelDB (https://github.com/google/leveldb) and WiscKey. Most added code
+resides in the directory `mod/`. In addition, you may see some code changes in other directories
+here and there.
+
+`read_cold` is an application that we use to measure the performance. You may run it with `--help`
+to view all options and their descriptions. We list some important ones here. However, please note
+that we **strongly** encourage you to write your own application to run your experiments.
+
+-m: running mode. We keep a Wisckey baseline mode inside the library as well for ease of testing.
+    "-m 8" is Wisckey and "-m 7" is Bourbon.
+
+-u: unlimited file descriptor. Baseline Wisckey (and LevelDB) assumes the system allows only
+    1024 opened file descriptors for a process at the same time, so it hardcode its file 
+    descriptor cache size to this value. We find it affect performance much with limited file 
+    descriptors so we unlimit file descriptor to at most 65536 with option "-u". The machine 
+    for artifact review has been configured to have unlimited file descriptor and please use 
+    this option for testing.
+
+-w: Use this option to perform a load.
+
+-l: "-l 0" (default) means ordered loads and "-l 3" means random loads.
+
+-i: number of iterations. Usually we use "-i 5" and use the average latency.
+
+-n: number of requests (in thousands) in one iteration.
+
+-f: the path to the dataset. The dataset file should contain one key per line.
+
+-d: the path to the database. If with "-w" mode, this directory will be created or cleaned if
+    already exists.
+
+--distribution: the path to the request distribution file. A distribution file should contain
+    one number "x" per line which indicate the x-th key in the dataset file
+
+--YCSB: the path to the YCSB trace file. A YCSB trace file should contain two number "m x" per
+    line, where m=0 means get and m=1 means put and x indicate the x-th key in the dataset file.
+
+-k, -v: the size of keys and values, in bytes.
+
+-c: cold read. With this option, before the workload the memory of the machine is cleared so 
+    that the database resides on the disk. Use this only if you have sudo access without 
+    entering a password.
+
+--change_level_load: This option will disable using existing level models. Using this option
+    will test on Sazerac-File (which is what we report), otherwise Sazerac-Level.
+
+To interpret the output results, please check the last few lines of the output.
+- Timer 13 is the total time, which is the time we report.
+- Timer 4 is the total time for all get requests.
+- Timer 10 is the total time for all put requests.
+- Timer 7 is the total compaction time.
+- Timer 11 is the total file model learning time.
+
+We have provided some scripts under `scripts/` for artifact reviews. Feel free to take a look at
+them to figure out how we ran our experiments. In any case, we still recommend you write your
+own application.
+
+Bourbon needs to be re-compiled with additional flags on for mixed workloads (workloads with reads
+and writes). Re-compile with the following:
+```
+cd build
+rm -rf *
+cmake /path/to/bourbon -DCMAKE_BUILD_TYPE=RELEASE \
+    -DNDEBUG_SWITCH=ON -DLEVEL_SWITCH=ON -DINTERNAL_TIMER_SWITCH=ON
+make -j
+```
+
+
+Questions?
+
+Feel free to ask in Piazza. We will be answering questions as frequent as we can.

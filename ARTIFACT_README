@@ -1,0 +1,96 @@
+Artifacts of Paper #475
+
+We have provided a machine from CloudLab to reproduce our experiments. Please see the login
+credentials from hotcrp. We use a c220g2 machine in Cloudlab Wisconsin.
+
+After logging on to the machine, run `scripts/run_all_expr.sh` to run the artifact and everything
+is done. We have already set up the whole experiment environment and necessary data. The
+parsed results are printed out to stdout and also written to files:
+~/evaluation/expr_{exp_name}.txt
+
+
+
+
+
+Instructions in detail if you want to setup by yourself:
+
+We have already set up the testing environment in the home directory. If you want to setup
+by yourself, please follow these steps after logging on to the machine:
+```
+cd ~
+rm -rf learned-leveldb/
+rm -rf build/
+rm -rf evaluation/
+git clone git@bitbucket.org:daiyifandanny/learned-leveldb.git
+mkdir build
+mkdir evaluation
+cd build
+cmake ../learned-leveldb -DCMAKE_BUILD_TYPE=RELEASE -DNDEBUG_SWITCH=ON
+make -j
+cd ~
+```
+
+We have included datasets and trace files under `/mnt/db`, all of which are ready to use.
+In addition, `/mnt/ssd` contains loaded database files. If you prefer to load them yourself,
+please run `scripts/load_db.sh`.
+
+We provide scripts to reproduce the following experiments:
+
+- `scripts/run_dataset.sh` reproduces how our system is influenced by various datasets (Section
+  5.2.1).
+- `scripts/run_load_order.sh` reproduces how sequential/random dataset load order affects lookup
+  latencies (Section 5.2.2).
+- `scripts/run_request_distribution.sh` reproduces lookup latencies under six request
+  distributions (Section 5.2.3).
+- `scripts/run_ycsb.sh` reproduces how our system performs under YCSB workloads (Section 5.4.1).
+- `scripts/run_sosd.sh` reproduces how our system performs under SOSD workloads (Section 5.4.2).
+
+To run all of them at once, please type in `scripts/run_all_expr.sh`.
+
+We leave out experiments for Section 5.3 (Read-Write Mix Workload) and Section 5.5 (Fast Storage).
+- A full reproduction of Section 5.3 needs more than one day and manual code changes to switch
+  to different versions. The performance on mix workloads can be represented by YCSB.
+- Section 5.5 needs a different set of machine configuration that is hard to provide access to.
+
+
+
+
+
+Instructions in more detail if you want to do single testing by yourself:
+
+If you want to run any of the single tests by yourself, please use the application "read_cold".
+This is also what we use during the experiments. Some of the important options is listed below.
+For a full option list, please use --help option.
+
+-m: running mode. We keep a Wisckey baseline mode inside the library as well for ease of testing.
+    "-m 8" is Wisckey and "-m 7" is our learned LSM system.
+-u: unlimited file descriptor. Baseline Wisckey (and LevelDB) assumes the system allows only
+    1024 opened file descriptors for a process at the same time, so it hardcode its file 
+    descriptor cache size to this value. We find it affect performance much with limited file 
+    descriptors so we unlimit file descriptor to at most 65536 with option "-u". The machine 
+    for artifact review has been configured to have unlimited file descriptor and please use 
+    this option for testing.
+-w: Use this option to perform a load.
+-l: "-l 0" (default) means ordered loads and "-l 3" means random loads.
+-i: number of iterations. Usually we use "-i 5" and use the average latency.
+-n: number of requests (in thousands) in one iteration.
+-f: the path to the dataset. The dataset file should contain one key per line.
+-d: the path to the database. If with "-w" mode, this directory will be created or cleaned if
+    already exists.
+--distribution: the path to the request distribution file. A distribution file should contain
+    one number "x" per line which indicate the x-th key in the dataset file
+--YCSB: the path to the YCSB trace file. A YCSB trace file should contain two number "m x" per
+    line, where m=0 means get and m=1 means put and x indicate the x-th key in the dataset file.
+-k, -v: the size of keys and values, in bytes.
+-c: cold read. With this option, before the workload the memory of the machine is cleared so 
+    that the database resides on the disk. Use this only if you have sudo access without 
+    entering a password.
+--change_level_load: This option will disable using existing level models. Using this option
+    will test on Sazerac-File (which is what we report), otherwise Sazerac-Level.
+
+To interpret the output results, please check the last few lines of the output.
+- Timer 13 is the total time, which is the time we report.
+- Timer 4 is the total time for all get requests.
+- Timer 10 is the total time for all put requests.
+- Timer 7 is the total compaction time.
+- Timer 11 is the total file model learning time.
