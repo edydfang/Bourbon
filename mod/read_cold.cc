@@ -1,3 +1,4 @@
+
 #include <cassert>
 #include <chrono>
 #include <iostream>
@@ -23,6 +24,7 @@ using std::to_string;
 using std::vector;
 using std::map;
 using std::ifstream;
+using std::ofstream;
 using std::string;
 
 int num_pairs_base = 1000;
@@ -93,6 +95,8 @@ int main(int argc, char *argv[]) {
     int load_type, insert_bound;
     string db_location_copy;
 
+    string output;
+
     cxxopts::Options commandline_options("leveldb read test", "Testing leveldb read performance.");
     commandline_options.add_options()
             ("n,get_number", "the number of gets (to be multiplied by 1024)", cxxopts::value<int>(num_operations)->default_value("1000"))
@@ -101,31 +105,32 @@ int main(int argc, char *argv[]) {
             ("m,modification", "if set, run our modified version", cxxopts::value<int>(adgMod::MOD)->default_value("0"))
             ("h,help", "print help message", cxxopts::value<bool>()->default_value("false"))
             ("d,directory", "the directory of db", cxxopts::value<string>(db_location)->default_value("/mnt/ssd/testdb"))
-            ("k,key_size", "the size of key", cxxopts::value<int>(adgMod::key_size)->default_value("8"))
+            ("k,key_size", "the size of key", cxxopts::value<int>(adgMod::key_size)->default_value("16"))
             ("v,value_size", "the size of value", cxxopts::value<int>(adgMod::value_size)->default_value("8"))
             ("single_timing", "print the time of every single get", cxxopts::value<bool>(print_single_timing)->default_value("false"))
             ("file_info", "print the file structure info", cxxopts::value<bool>(print_file_info)->default_value("false"))
             ("test_num_segments", "test: number of segments per level", cxxopts::value<float>(test_num_segments_base)->default_value("1"))
             ("string_mode", "test: use string or int in model", cxxopts::value<bool>(adgMod::string_mode)->default_value("false"))
-            ("e,model_error", "error in the model", cxxopts::value<uint32_t>(adgMod::model_error)->default_value("8"))
+            ("e,model_error", "error in modesl", cxxopts::value<uint32_t>(adgMod::model_error)->default_value("8"))
             ("f,input_file", "the filename of input file", cxxopts::value<string>(input_filename)->default_value(""))
             ("multiple", "test: use larger keys", cxxopts::value<uint64_t>(adgMod::key_multiple)->default_value("1"))
-            ("w,write", "set to true to turn off online learning", cxxopts::value<bool>(fresh_write)->default_value("false"))
+            ("w,write", "writedb", cxxopts::value<bool>(fresh_write)->default_value("false"))
             ("c,uncache", "evict cache", cxxopts::value<bool>(evict)->default_value("false"))
             ("u,unlimit_fd", "unlimit fd", cxxopts::value<bool>(unlimit_fd)->default_value("false"))
             ("x,dummy", "dummy option")
             ("l,load_type", "load type", cxxopts::value<int>(load_type)->default_value("0"))
             ("filter", "use filter", cxxopts::value<bool>(adgMod::use_filter)->default_value("false"))
-            ("mix", "mix read and write", cxxopts::value<int>(num_mix)->default_value("0"))
+            ("mix", "portion of writes in workload", cxxopts::value<int>(num_mix)->default_value("0"))
             ("distribution", "operation distribution", cxxopts::value<string>(distribution_filename)->default_value(""))
             ("change_level_load", "load level model", cxxopts::value<bool>(change_level_load)->default_value("false"))
-            ("change_file_load", "load file model", cxxopts::value<bool>(change_file_load)->default_value("false"))
-            ("change_level_learning", "enable level learning", cxxopts::value<bool>(change_level_learning)->default_value("false"))
+            ("change_file_load", "enable level learning", cxxopts::value<bool>(change_file_load)->default_value("false"))
+            ("change_level_learning", "load file model", cxxopts::value<bool>(change_level_learning)->default_value("false"))
             ("change_file_learning", "enable file learning", cxxopts::value<bool>(change_file_learning)->default_value("false"))
             ("p,pause", "pause between operation", cxxopts::value<bool>(pause)->default_value("false"))
             ("policy", "learn policy", cxxopts::value<int>(adgMod::policy)->default_value("0"))
             ("YCSB", "use YCSB trace", cxxopts::value<string>(ycsb_filename)->default_value(""))
-            ("insert", "insert new value", cxxopts::value<int>(insert_bound)->default_value("0"));
+            ("insert", "insert new value", cxxopts::value<int>(insert_bound)->default_value("0"))
+            ("output", "output key list", cxxopts::value<string>(output)->default_value(""));
     auto result = commandline_options.parse(argc, argv);
     if (result.count("help")) {
         printf("%s", commandline_options.help().c_str());
@@ -144,6 +149,9 @@ int main(int argc, char *argv[]) {
     adgMod::load_level_model ^= change_level_load;
     adgMod::load_file_model ^= change_file_load;
 
+   // adgMod::file_learning_enabled = false;
+
+
     vector<string> keys;
     vector<uint64_t> distribution;
     vector<int> ycsb_is_write;
@@ -155,9 +163,10 @@ int main(int argc, char *argv[]) {
             string the_key = generate_key(key);
             keys.push_back(std::move(the_key));
         }
+        //adgMod::key_size = (int) keys.front().size();
     } else {
         std::uniform_int_distribution<uint64_t> udist_key(0, 999999999999999);
-        for (int i = 0; i < 10000000; ++i) {
+        for (int i = 0; i < 100000000; ++i) {
             keys.push_back(generate_key(to_string(udist_key(e2))));
         }
     }
@@ -284,6 +293,14 @@ int main(int argc, char *argv[]) {
             instance->PauseTimer(9, true);
             cout << "Put Complete" << endl;
 
+            if (!output.empty()) {
+                ofstream fd;
+                fd.open(output);
+                for (int i = 0; i < keys.size(); ++i)
+                    fd << keys[i] << "\n";
+                fd.close();
+            }
+
             keys.clear();
 
             // reopen DB and do offline leraning
@@ -295,12 +312,12 @@ int main(int argc, char *argv[]) {
             if (adgMod::MOD == 6 || adgMod::MOD == 7) {
                 Version* current = adgMod::db->versions_->current();
                 
-                // offline level learning
+                // level learning
                 for (int i = 1; i < config::kNumLevels; ++i) {
                     LearnedIndexData::Learn(new VersionAndSelf{current, adgMod::db->version_count, current->learned_index_data_[i].get(), i});
                 }
 
-                // offline file learning
+                // file learning
                 current->FileLearn();
             }
             cout << "Shutting down" << endl;
