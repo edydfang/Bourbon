@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
             ("policy", "learn policy", cxxopts::value<int>(adgMod::policy)->default_value("0"))
             ("YCSB", "use YCSB trace", cxxopts::value<string>(ycsb_filename)->default_value(""))
             ("insert", "insert new value", cxxopts::value<int>(insert_bound)->default_value("0"))
-            ("output", "output key list", cxxopts::value<string>(output)->default_value(""));
+            ("output", "output key list", cxxopts::value<string>(output)->default_value("key_list.txt"));
     auto result = commandline_options.parse(argc, argv);
     if (result.count("help")) {
         printf("%s", commandline_options.help().c_str());
@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
         //adgMod::key_size = (int) keys.front().size();
     } else {
         std::uniform_int_distribution<uint64_t> udist_key(0, 999999999999999);
-        for (int i = 0; i < 100000000; ++i) {
+        for (int i = 0; i < 1000000; ++i) {
             keys.push_back(generate_key(to_string(udist_key(e2))));
         }
     }
@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
         mix_base = 1000;
         num_mix -= 1000;
     }
-    
+
     for (size_t iteration = 0; iteration < num_iteration; ++iteration) {
         if (copy_out) {
             rc = system("sudo fstrim -a -v");
@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
         write_options.sync = false;
         instance->ResetAll();
 
-        
+
         if (fresh_write && iteration == 0) {
             // Load DB
             // clear existing directory, clear page cache, trim SSD
@@ -293,13 +293,11 @@ int main(int argc, char *argv[]) {
             instance->PauseTimer(9, true);
             cout << "Put Complete" << endl;
 
-            if (!output.empty()) {
-                ofstream fd;
-                fd.open(output);
-                for (int i = 0; i < keys.size(); ++i)
-                    fd << keys[i] << "\n";
-                fd.close();
-            }
+            ofstream fd;
+            fd.open(db_location + "/" + output);
+            for (int i = 0; i < keys.size(); ++i)
+                fd << keys[i] << "\n";
+            fd.close();
 
             keys.clear();
 
@@ -311,13 +309,13 @@ int main(int argc, char *argv[]) {
             adgMod::db->WaitForBackground();
             if (adgMod::MOD == 6 || adgMod::MOD == 7) {
                 Version* current = adgMod::db->versions_->current();
-                
-                // level learning
+
+                // offline level learning
                 for (int i = 1; i < config::kNumLevels; ++i) {
-                    LearnedIndexData::Learn(new VersionAndSelf{current, adgMod::db->version_count, current->learned_index_data_[i].get(), i});
+                    LearnedIndexData::LevelLearn(new VersionAndSelf{current, adgMod::db->version_count, current->learned_index_data_[i].get(), i});
                 }
 
-                // file learning
+                // offline file learning
                 current->FileLearn();
             }
             cout << "Shutting down" << endl;
@@ -335,6 +333,7 @@ int main(int argc, char *argv[]) {
                 adgMod::key_size = (int) keys.front().size();
             }
             fresh_write = false;
+            return 0;
         }
 
 

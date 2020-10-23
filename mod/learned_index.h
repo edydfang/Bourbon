@@ -128,7 +128,7 @@ namespace adgMod {
         bool Learned();
         bool Learned(Version* version, int v_count, int level);
         bool Learned(Version* version, int v_count, FileMetaData* meta, int level);
-        static void Learn(void* arg);
+        static void LevelLearn(void* arg);
         static uint64_t FileLearn(void* arg);
 
         // Load all the keys in the file/level

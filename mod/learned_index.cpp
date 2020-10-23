@@ -83,7 +83,7 @@ namespace adgMod {
 
     // static learning function to be used with LevelDB background scheduling
     // level learning
-    void LearnedIndexData::Learn(void *arg) {
+    void LearnedIndexData::LevelLearn(void *arg) {
         Stats* instance = Stats::GetInstance();
         bool success = false;
         bool entered = false;
@@ -148,6 +148,7 @@ namespace adgMod {
         auto time = instance->PauseTimer(11, true);
 
         if (entered) {
+          // count how many file learning are done.
             self->cost = time.second - time.first;
             learn_counter_mutex.Lock();
             events[1].push_back(new LearnEvent(time, 1, self->level, true));
