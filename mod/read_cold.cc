@@ -312,6 +312,8 @@ int main(int argc, char *argv[]) {
 
                 // offline level learning
                 for (int i = 1; i < config::kNumLevels; ++i) {
+                    //TODO: 1. cannot find the value
+                    //      2. the returned range is 17 instead of 3
                     LearnedIndexData::LevelLearn(new VersionAndSelf{current, adgMod::db->version_count, current->learned_index_data_[i].get(), i});
                 }
 
