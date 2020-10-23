@@ -407,7 +407,7 @@ namespace leveldb {
                         // use level model to get the target file
                         learned = true;
                         std::pair<uint64_t, uint64_t> bounds = learned_this_level->GetPosition(user_key);
-                        size_t index;
+//                        size_t index;
                         if (bounds.first <= learned_this_level->MaxPosition()) {
 //                            learned_this_level->num_entries_accumulated.Search(user_key, bounds.first, bounds.second, &index, &position_lower, &position_upper);
 
@@ -419,7 +419,7 @@ namespace leveldb {
                                 FileMetaData *file = files_[level][i];
                                 if (ucmp->Compare(file->smallest.user_key(), user_key) <= 0
                                     && ucmp->Compare(file->largest.user_key(), user_key) > 0) {
-                                    files = &files_[level][index];
+                                    files = &files_[level][i];
                                     num_files = 1;
                                     break;
                                 }
