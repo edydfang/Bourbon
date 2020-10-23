@@ -143,6 +143,8 @@ namespace adgMod {
 
         // test functions when developing CBA...
         void FillCBAStat(bool positive, bool model, uint64_t time);
+
+        bool Learn(bool file);
     };
 
     // an array storing all file models and provide similar access interface with multithread protection

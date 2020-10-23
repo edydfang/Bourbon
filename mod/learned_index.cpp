@@ -51,10 +51,14 @@ namespace adgMod {
         return error;
     }
 
-    // Actual function doing learning
     bool LearnedIndexData::Learn() {
+        return Learn(true);
+    }
+
+    // Actual function doing learning
+    bool LearnedIndexData::Learn(bool file) {
         // FILL IN GAMMA (error)
-        PLR plr = PLR(error);
+        PLR plr = PLR(file ? error : 0.5);
 
         // check if data if filled
         if (string_keys.empty()) assert(false);
@@ -100,7 +104,7 @@ namespace adgMod {
             if (vas->version->FillLevel(adgMod::read_options, vas->level)) {
                 self->filled = true;
                 if (db->version_count == vas->v_count) {
-                    if (env->compaction_awaiting.load() == 0 && self->Learn()) {
+                    if (env->compaction_awaiting.load() == 0 && self->Learn(false)) {
                         success = true;
                     } else {
                         self->learning.store(false);
