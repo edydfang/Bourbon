@@ -14,7 +14,8 @@ namespace adgMod {
     int MOD = 5;
     bool string_mode = true;
     uint64_t key_multiple = 1;
-    uint32_t model_error = 10;
+    uint32_t file_model_error = 10;
+    uint32_t level_model_error = 1;
     int block_restart_interval = 16;
     uint32_t test_num_level_segments = 100;
     uint32_t test_num_file_segments = 100;

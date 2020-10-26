@@ -415,7 +415,7 @@ namespace leveldb {
 //
                             files = nullptr;
                             num_files = 0;
-                            for (int i = bounds.first; i < bounds.second; ++i) {
+                            for (int i = bounds.first; i <= bounds.second && i<files_[level].size(); ++i) {
                                 FileMetaData *file = files_[level][i];
                                 if (ucmp->Compare(file->smallest.user_key(), user_key) <= 0
                                     && ucmp->Compare(file->largest.user_key(), user_key) > 0) {
@@ -1784,24 +1784,11 @@ namespace leveldb {
 
         for (int j = 0; j < files_[level].size(); ++j) {
             FileMetaData *file = files_[level][j];
-            //adgMod::test_num_file_segments = adgMod::test_num_level_segments / (uint32_t) files_[level].size();
-
-            // Fill file data
-//        bool rt = adgMod::file_data->FillData(this, file);
-//        assert(rt);
-
-            // copy to level data
-//        auto& file_data = adgMod::file_data->GetData(file);
-//        data->string_keys.insert(data->string_keys.end(), file_data.begin(), file_data.end());
             data->string_keys.emplace_back(file->smallest.user_key().data(), file->smallest.user_key().size());
-            //file_data.clear();
-
-            // update AccumulatedArray for level model
-//        uint64_t current_total = data->num_entries_accumulated.NumEntries();
-//        const Slice& largest_key = file->largest.user_key();
-//        data->num_entries_accumulated.Add(current_total + file_data.size(), string(largest_key.data(), largest_key.size()));
-            //adgMod::file_data->GetAccumulatedArray(file->number)->array.clear();
         }
+        // push the maximun key in to the data points
+        int last_idx = files_[level].size() - 1;
+        data->string_keys.emplace_back(files_[level][last_idx]->largest.user_key().data(), files_[level][last_idx]->largest.user_key().size());
         return true;
     }
 

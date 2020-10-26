@@ -39,7 +39,8 @@ namespace adgMod {
     // used in early testing
     extern bool string_mode;
     extern uint64_t key_multiple;
-    extern uint32_t model_error;
+    extern uint32_t file_model_error;
+    extern uint32_t level_model_error;
     extern int block_restart_interval;
     extern uint32_t test_num_level_segments;
     extern uint32_t test_num_file_segments;
