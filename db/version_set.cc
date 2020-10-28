@@ -418,7 +418,7 @@ namespace leveldb {
                             for (int i = bounds.first; i <= bounds.second && i<files_[level].size(); ++i) {
                                 FileMetaData *file = files_[level][i];
                                 if (ucmp->Compare(file->smallest.user_key(), user_key) <= 0
-                                    && ucmp->Compare(file->largest.user_key(), user_key) > 0) {
+                                    && ucmp->Compare(file->largest.user_key(), user_key) >= 0) {
                                     files = &files_[level][i];
                                     num_files = 1;
                                     break;
