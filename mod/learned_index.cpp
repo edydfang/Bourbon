@@ -41,6 +41,7 @@ std::pair<uint64_t, uint64_t> LearnedIndexData::GetPosition(
   // calculate the interval according to the selected segment
   double result =
       target_int * string_segments[left].k + string_segments[left].b;
+  result = is_level ? result / 2 : result;
   uint64_t lower =
       result - error > 0 ? (uint64_t)std::floor(result - error) : 0;
   uint64_t upper = (uint64_t)std::ceil(result + error);

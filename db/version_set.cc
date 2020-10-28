@@ -1785,10 +1785,9 @@ namespace leveldb {
         for (int j = 0; j < files_[level].size(); ++j) {
             FileMetaData *file = files_[level][j];
             data->string_keys.emplace_back(file->smallest.user_key().data(), file->smallest.user_key().size());
+            data->string_keys.emplace_back(file->largest.user_key().data(), file->largest.user_key().size());
         }
         // push the maximun key in to the data points
-        int last_idx = files_[level].size() - 1;
-        data->string_keys.emplace_back(files_[level][last_idx]->largest.user_key().data(), files_[level][last_idx]->largest.user_key().size());
         return true;
     }
 
