@@ -61,8 +61,8 @@ GreedyPLR::GreedyPLR(double gamma) {
 int counter = 0;
 
 Segment
-GreedyPLR::process(const struct point& pt) {
-    this->last_pt = pt;
+GreedyPLR::process(const struct point& pt, bool file) {
+    Segment s = {0, 0, 0};
     if (this->state.compare("need2") == 0) {
         this->s0 = pt;
         this->state = "need1";
@@ -71,12 +71,12 @@ GreedyPLR::process(const struct point& pt) {
         setup();
         this->state = "ready";
     } else if (this->state.compare("ready") == 0) {
-        return process__(pt);
+        s = process__(pt, file);
     } else {
         // impossible
         std::cout << "ERROR in process" << std::endl;
     }
-    Segment s = {0, 0, 0};
+    this->last_pt = pt;
     return s;
 }
 
@@ -99,11 +99,18 @@ GreedyPLR::current_segment() {
 }
 
 Segment
-GreedyPLR::process__(struct point pt) {
+GreedyPLR::process__(struct point pt, bool file) {
     if (!(is_above(pt, this->rho_lower) && is_below(pt, this->rho_upper))) {
         Segment prev_segment = current_segment();
-        this->s0 = pt;
-        this->state = "need1";
+        if (!file && (u_int32_t) pt.y % 2 == 1) {
+            this->s0 = last_pt;
+            this->s1 = pt;
+            this->state = "ready";
+            return prev_segment;
+        } else {
+            this->s0 = pt;
+            this->state = "need1";
+        }
         return prev_segment;
     }
 
@@ -150,7 +157,7 @@ PLR::train(std::vector<string>& keys, bool file) {
     int count = 0;
     size_t size = keys.size();
     for (int i = 0; i < size; ++i) {
-        Segment seg = plr.process(point((double) stoull(keys[i]), i));
+        Segment seg = plr.process(point((double) stoull(keys[i]), i), file);
         if (seg.x != 0 ||
             seg.k != 0 ||
             seg.b != 0) {

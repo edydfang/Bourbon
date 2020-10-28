@@ -49,11 +49,11 @@ private:
 
     void setup();
     Segment current_segment();
-    Segment process__(struct point pt);
+    Segment process__(struct point pt, bool file);
 
 public:
     GreedyPLR(double gamma);
-    Segment process(const struct point& pt);
+    Segment process(const struct point& pt, bool file);
     Segment finish();
 };
 
