@@ -111,8 +111,8 @@ namespace adgMod {
 
 
 
-        explicit LearnedIndexData(int allowed_seek) : error(file_model_error), learned(false), aborted(false), learning(false),
-            learned_not_atomic(false), allowed_seek(allowed_seek), current_seek(0), filled(false), is_level(false), level(0), served(0), cost(0) {};
+        explicit LearnedIndexData(int allowed_seek, bool level_model) : error(level_model?level_model_error:file_model_error), learned(false), aborted(false), learning(false),
+            learned_not_atomic(false), allowed_seek(allowed_seek), current_seek(0), filled(false), is_level(level_model), level(0), served(0), cost(0) {};
         LearnedIndexData(const LearnedIndexData& other) = delete;
 
         // Inference function. Return the predicted interval.

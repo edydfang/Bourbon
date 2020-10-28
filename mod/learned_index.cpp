@@ -57,13 +57,8 @@ uint64_t LearnedIndexData::MaxPosition() const { return size - 1; }
 
 double LearnedIndexData::GetError() const { return error; }
 
-bool LearnedIndexData::Learn() { return Learn(true); }
-
 // Actual function doing learning
-bool LearnedIndexData::Learn(bool file) {
-  if (!file) {
-    error = adgMod::level_model_error;
-  }
+bool LearnedIndexData::Learn() {
   // FILL IN GAMMA (error)
   PLR plr = PLR(error);
 
@@ -111,7 +106,7 @@ void LearnedIndexData::LevelLearn(void* arg) {
     if (vas->version->FillLevel(adgMod::read_options, vas->level)) {
       self->filled = true;
       if (db->version_count == vas->v_count) {
-        if (env->compaction_awaiting.load() == 0 && self->Learn(false)) {
+        if (env->compaction_awaiting.load() == 0 && self->Learn()) {
           success = true;
         } else {
           self->learning.store(false);
@@ -323,7 +318,7 @@ LearnedIndexData* FileLearnedIndexData::GetModel(int number) {
   if (file_learned_index_data.size() <= number)
     file_learned_index_data.resize(number + 1, nullptr);
   if (file_learned_index_data[number] == nullptr)
-    file_learned_index_data[number] = new LearnedIndexData(file_allowed_seek);
+    file_learned_index_data[number] = new LearnedIndexData(file_allowed_seek, false);
   return file_learned_index_data[number];
 }
 

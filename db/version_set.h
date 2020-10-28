@@ -146,7 +146,7 @@ class Version {
         compaction_score_(-1),
         compaction_level_(-1) {
             for (int i = 0; i < config::kNumLevels; ++i)
-                learned_index_data_.push_back(std::make_shared<adgMod::LearnedIndexData>(adgMod::level_allowed_seek));
+                learned_index_data_.push_back(std::make_shared<adgMod::LearnedIndexData>(adgMod::level_allowed_seek, true));
         }
 
   Version(const Version&) = delete;
