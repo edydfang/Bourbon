@@ -101,10 +101,13 @@ GreedyPLR::current_segment() {
 Segment
 GreedyPLR::process__(struct point pt, bool file) {
     if (!(is_above(pt, this->rho_lower) && is_below(pt, this->rho_upper))) {
+      // new point out of error bounds
         Segment prev_segment = current_segment();
         if (!file && (u_int32_t) pt.y % 2 == 1) {
+          // current point is the largest point in the segments
             this->s0 = last_pt;
             this->s1 = pt;
+            setup();
             this->state = "ready";
             return prev_segment;
         } else {
