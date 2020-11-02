@@ -398,7 +398,7 @@ namespace leveldb {
                 files = &tmp[0];
                 num_files = tmp.size();
             } else {
-                if (adgMod::MOD == 6 || adgMod::MOD == 7) {
+                if (adgMod::MOD == 9) {
                     // Check if a level model is available
                     adgMod::LearnedIndexData *learned_this_level = learned_index_data_[level].get();
                     if (learned_this_level->Learned(this, adgMod::db->version_count, level)) {

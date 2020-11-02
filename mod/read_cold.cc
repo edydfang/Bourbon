@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
             ("n,get_number", "the number of gets (to be multiplied by 1024)", cxxopts::value<int>(num_operations)->default_value("1000"))
             ("s,step", "the step of the loop of the size of db", cxxopts::value<float>(num_pair_step)->default_value("1"))
             ("i,iteration", "the number of iterations of a same size", cxxopts::value<int>(num_iteration)->default_value("1"))
-            ("m,modification", "if set, run our modified version", cxxopts::value<int>(adgMod::MOD)->default_value("0"))
+            ("m,modification", "if set, run our modified version, 7 fjle-model bourbon, 8 wiskey, 9 ours", cxxopts::value<int>(adgMod::MOD)->default_value("0"))
             ("h,help", "print help message", cxxopts::value<bool>()->default_value("false"))
             ("d,directory", "the directory of db", cxxopts::value<string>(db_location)->default_value("/mnt/ssd/testdb"))
             ("k,key_size", "the size of key", cxxopts::value<int>(adgMod::key_size)->default_value("16"))
@@ -125,8 +125,6 @@ int main(int argc, char *argv[]) {
             ("distribution", "operation distribution", cxxopts::value<string>(distribution_filename)->default_value(""))
             ("change_level_load", "load level model", cxxopts::value<bool>(change_level_load)->default_value("false"))
             ("change_file_load", "enable level learning", cxxopts::value<bool>(change_file_load)->default_value("false"))
-            ("change_level_learning", "load file model", cxxopts::value<bool>(change_level_learning)->default_value("false"))
-            ("change_file_learning", "enable file learning", cxxopts::value<bool>(change_file_learning)->default_value("false"))
             ("p,pause", "pause between operation", cxxopts::value<bool>(pause)->default_value("false"))
             ("policy", "learn policy", cxxopts::value<int>(adgMod::policy)->default_value("0"))
             ("YCSB", "use YCSB trace", cxxopts::value<string>(ycsb_filename)->default_value(""))
@@ -145,8 +143,6 @@ int main(int argc, char *argv[]) {
 
     adgMod::fd_limit = unlimit_fd ? 1024 * 1024 : 1024;
     adgMod::restart_read = true;
-    adgMod::level_learning_enabled ^= change_level_learning;
-    adgMod::file_learning_enabled ^= change_file_learning;
     adgMod::load_level_model ^= change_level_load;
     adgMod::load_file_model ^= change_file_load;
 
@@ -308,13 +304,11 @@ int main(int argc, char *argv[]) {
             delete db;
             status = DB::Open(options, db_location, &db);
             adgMod::db->WaitForBackground();
-            if (adgMod::MOD == 6 || adgMod::MOD == 7) {
+            if (adgMod::MOD == 6 || adgMod::MOD == 7 || adgMod::MOD == 9) {
                 Version* current = adgMod::db->versions_->current();
 
                 // offline level learning
                 for (int i = 1; i < config::kNumLevels; ++i) {
-                    //TODO: 1. cannot find the value
-                    //      2. the returned range is 17 instead of 3
                     LearnedIndexData::LevelLearn(new VersionAndSelf{current, adgMod::db->version_count, current->learned_index_data_[i].get(), i});
                 }
 

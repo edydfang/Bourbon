@@ -157,14 +157,13 @@ Status TableCache::Get(const ReadOptions& options, uint64_t file_number,
   Cache::Handle* handle = nullptr;
   adgMod::Stats* instance = adgMod::Stats::GetInstance();
 
-  if ((adgMod::MOD == 6 || adgMod::MOD == 7)) {
+  if ((adgMod::MOD == 6 || adgMod::MOD == 7 || adgMod::MOD == 9)) {
       // check if file model is ready
-      // TODO: if level model is used, skip this step
       *model = adgMod::file_data->GetModel(meta->number);
       assert(file_learned != nullptr);
       *file_learned = (*model)->Learned();
 
-      // if level model is used of file model is available, go Bourbon path
+      // if level model is used or file model is available, go Bourbon path
       if (learned || *file_learned) {
           LevelRead(options, file_number, file_size, k, arg, handle_result, level, meta, lower, upper, learned, version);
           return Status::OK();

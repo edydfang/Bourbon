@@ -79,7 +79,7 @@ void BlockBuilder::Add(const Slice& key, const Slice& value) {
   size_t shared = 0;
   if (counter_ < options_->block_restart_interval) {
     // See how much sharing to do with previous string
-    if (adgMod::MOD != 6 && adgMod::MOD != 7) {
+    if (adgMod::MOD != 6 && adgMod::MOD != 7 && adgMod::MOD != 9)  {
 //        const size_t min_length = std::min(last_key_piece.size(), key.size());
 //        while ((shared < min_length) && (last_key_piece[shared] == key[shared])) {
 //            shared++;
