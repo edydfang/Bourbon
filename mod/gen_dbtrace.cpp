@@ -13,7 +13,6 @@ int gen_dbkey(const string &key_distribution, uint32_t num_keys, uint32_t gap, s
   ofstream fd;
   fd.open(output_path);
   if(key_distribution.compare("linear") == 0) {
-    cout <<key_distribution;
     for (int i = 0; i < num_keys; ++i)
       fd << i << "\n";
   } else if (key_distribution.compare("segmented1p") == 0 || key_distribution.compare("segmented10p") == 0) {
@@ -58,7 +57,7 @@ int main(int argc, char *argv[]) {
       ("k,dbkey", "generate file for db key", cxxopts::value<bool>(db_key)->default_value("true"))
       ("d,keydis", "distribution for the key [linear, segmented1p, segmented10p, normal]", cxxopts::value<string>(key_distribution)->default_value("linear"))
       ("o,output", "path to the output file", cxxopts::value<string>(output_path)->default_value("./output.txt"))
-      ("g, gap", "gap,between key segments", cxxopts::value<uint32_t>(num_keys)->default_value("100"))
+      ("g, gap", "gap,between key segments", cxxopts::value<uint32_t>(gap)->default_value("100"))
   ("n", "number of keys", cxxopts::value<uint32_t>(num_keys)->default_value("1000000"));
   auto result = commandline_options.parse(argc, argv);
   if (result.count("help")) {
