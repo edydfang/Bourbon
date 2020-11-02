@@ -844,7 +844,7 @@ void DBImpl::BackgroundCompaction() {
     DeleteObsoleteFiles();
   }
 
-  if (c != nullptr) {
+  if (c != nullptr && adgMod::MOD == 9 && !adgMod::fresh_write) {
       //TODO: enqueue updated levels
       Version* current = versions_->current();
       int level = c->level();
