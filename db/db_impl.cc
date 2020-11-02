@@ -844,9 +844,13 @@ void DBImpl::BackgroundCompaction() {
     DeleteObsoleteFiles();
   }
 
-
-
-
+  if (c != nullptr) {
+      //TODO: enqueue updated levels
+      Version* current = versions_->current();
+      int level = c->level();
+      adgMod::LearnedIndexData::LevelLearn(new adgMod::VersionAndSelf{current, version_count, current->learned_index_data_[level].get(), level});
+      adgMod::LearnedIndexData::LevelLearn(new adgMod::VersionAndSelf{current, version_count, current->learned_index_data_[level+1].get(), level+1});
+  }
 
     if (c != nullptr) {
         std::set<int> changed_level;
