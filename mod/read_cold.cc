@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
             ("x,dummy", "dummy option")
             ("l,load_type", "load type", cxxopts::value<int>(load_type)->default_value("0"))
             ("filter", "use filter", cxxopts::value<bool>(adgMod::use_filter)->default_value("false"))
-            ("mix", "portion of writes in workload", cxxopts::value<int>(num_mix)->default_value("0"))
+            ("mix", "portion of writes in workload in 1000 operations", cxxopts::value<int>(num_mix)->default_value("0"))
             ("distribution", "operation distribution", cxxopts::value<string>(distribution_filename)->default_value(""))
             ("change_level_load", "load level model", cxxopts::value<bool>(change_level_load)->default_value("false"))
             ("change_file_load", "enable level learning", cxxopts::value<bool>(change_file_load)->default_value("false"))
@@ -361,20 +361,7 @@ int main(int argc, char *argv[]) {
         status = DB::Open(options, db_location, &db);
         adgMod::db->WaitForBackground();
         assert(status.ok() && "Open Error");
-//            for (int s = 12; s < 20; ++s) {
-//                instance->ResetTimer(s);
-//            }
 
-//        if (adgMod::MOD == 6 || adgMod::MOD == 7) {
-//            for (int i = 1; i < config::kNumLevels; ++i) {
-//                Version* current = adgMod::db->versions_->current();
-//                LearnedIndexData::Learn(new VersionAndSelf{current, adgMod::db->version_count, current->learned_index_data_[i].get(), i});
-//            }
-//        }
-//        cout << "Shutting down" << endl;
-//        adgMod::db->WaitForBackground();
-//        delete db;
-//        return 0;
 
         uint64_t last_read = 0, last_write = 0;
         int last_level = 0, last_file = 0, last_baseline = 0, last_succeeded = 0, last_false = 0, last_compaction = 0, last_learn = 0;

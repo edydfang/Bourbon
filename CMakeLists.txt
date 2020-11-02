@@ -385,6 +385,7 @@ if(LEVELDB_BUILD_TESTS)
     leveldb_test("${PROJECT_SOURCE_DIR}/util/logging_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/mod/read.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/mod/read_cold.cc")
+    leveldb_test("${PROJECT_SOURCE_DIR}/mod/gen_dbtrace.cpp")
 
     # TODO(costan): This test also uses
     #               "${PROJECT_SOURCE_DIR}/util/env_{posix|windows}_test_helper.h"
