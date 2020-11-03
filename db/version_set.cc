@@ -370,9 +370,7 @@ namespace leveldb {
             bool learned = false;
 
             // Step FindFile
-#ifdef INTERNAL_TIMER
             instance->StartTimer(0);
-#endif
             if (level == 0) {
                 // Level-0 files may overlap each other.  Find all files that
                 // overlap user_key and process them in order from newest to oldest.
@@ -388,9 +386,7 @@ namespace leveldb {
                     }
                 }
                 if (tmp.empty()) {
-#ifdef INTERNAL_TIMER
                     instance->PauseTimer(0);
-#endif
                     continue;
                 }
 
@@ -402,7 +398,7 @@ namespace leveldb {
                     // Check if a level model is available
                     adgMod::LearnedIndexData *learned_this_level = learned_index_data_[level].get();
                     if (learned_this_level->Learned(this, adgMod::db->version_count, level)) {
-                        //std::cout << "using model" << std::endl;
+                        adgMod::levelled_counters[13].Increment(level);
                         // use level model to get the target file
                         learned = true;
                         std::pair<uint64_t, uint64_t> bounds = learned_this_level->GetPosition(user_key);
@@ -426,7 +422,7 @@ namespace leveldb {
                         }
                     } else {
                         // if no models available follow the baseline path
-
+                        adgMod::levelled_counters[14].Increment(level);
                         // Binary search to find earliest index whose largest key >= ikey.
                         uint32_t index = FindFile(vset_->icmp_, files_[level], ikey);
                         if (index >= num_files) {
@@ -445,6 +441,7 @@ namespace leveldb {
                         }
                     }
                 } else {
+                    adgMod::levelled_counters[14].Increment(level);
                     // Binary search to find earliest index whose largest key >= ikey.
                     uint32_t index = FindFile(vset_->icmp_, files_[level], ikey);
                     if (index >= num_files) {
@@ -463,9 +460,7 @@ namespace leveldb {
                     }
                 }
             }
-#ifdef INTERNAL_TIMER
-            auto temp2 = instance->PauseTimer(0);
-#endif
+            instance->PauseTimer(0);
             for (uint32_t i = 0; i < num_files; ++i) {
                 if (last_file_read != nullptr && stats->seek_file == nullptr) {
                     // We have had more than one seek for this read.  Charge the 1st file.

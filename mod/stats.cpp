@@ -29,6 +29,9 @@ namespace adgMod {
         levelled_counters[9].name = "FilteredLookup";
         levelled_counters[10].name = "PutWait";
         levelled_counters[11].name = "FileLearn";
+        levelled_counters[12].name = "LevelLearn";
+        levelled_counters[13].name = "LevelModelUse";
+        levelled_counters[14].name = "LevelModelNotUse";
     }
 
     Stats* Stats::GetInstance() {

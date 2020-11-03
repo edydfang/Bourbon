@@ -509,6 +509,11 @@ int main(int argc, char *argv[]) {
         for (Counter& c : levelled_counters) c.Report();
 
         file_data->Report();
+        Version* current = adgMod::db->versions_->current();
+        cout << "Level model stats:" << endl;
+        for (int i = 1; i < config::kNumLevels; ++i) {
+            current->learned_index_data_[i]->ReportStats();
+        }
 
         for (auto it : file_stats) {
             printf("FileStats %d %d %lu %lu %u %u %lu %d\n", it.first, it.second.level, it.second.start,
