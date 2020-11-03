@@ -26,6 +26,8 @@ int gen_dbkey(const string &key_distribution, uint32_t num_keys, uint32_t gap, s
     for (int i = 0; i < num_keys; ++i) {
       if (i%seg_len == 0){
         x += gap;
+      } else {
+        x += 1;
       }
       fd << x << "\n";
     }
