@@ -63,11 +63,27 @@ that we **strongly** encourage you to write your own application to run your exp
     will test on Sazerac-File (which is what we report), otherwise Sazerac-Level.
 
 To interpret the output results, please check the last few lines of the output.
+Internal
+- Timer 0: file lookup time within one level, version_set.cc
+- Timer 1: file reading time, table_cache.cc
+- Timer 2: file model inference time, table_cache.cc
+- Timer 3: key search time in file - first search
+- Timer 5: key search time in file - rest time
+- TImer 12: Value reading time
+- Timer 14: value read from memtable or immtable
+- Timer 15: FilteredLookup time
+
+- Timer 6: Total key search time given files
 - Timer 13 is the total time, which is the time we report.
 - Timer 4 is the total time for all get requests.
 - Timer 10 is the total time for all put requests.
 - Timer 7 is the total compaction time.
 - Timer 11 is the total file model learning time.
+- Timer 8 is the total level learning time
+- timer 9: Total fresh write time (db load)
+- timer 16: time to compact memtable
+
+WorkloadEvent level_get, file_get, baseline_get, success_get, false_get, num_compaction, num_learn, read_time, write_time
 
 We have provided some scripts under `scripts/` for artifact reviews. Feel free to take a look at
 them to figure out how we ran our experiments. In any case, we still recommend you write your

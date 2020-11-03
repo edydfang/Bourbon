@@ -61,7 +61,7 @@ public:
                     int compaction, int learn, uint64_t read, uint64_t write, std::vector<uint64_t>&& times) :
                     Event(time_), level_get(level), file_get(file), baseline_get(baseline), success_get(success), false_get(failed),
                     num_compaction(compaction), num_learn(learn), read_time(read), write_time(write), detailed_times(times) {};
-    void Report();
+    void Report() override;
 };
 
 #endif //LEVELDB_EVENT_H

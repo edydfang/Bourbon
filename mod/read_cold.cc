@@ -204,9 +204,9 @@ int main(int argc, char *argv[]) {
     }
 
     for (size_t iteration = 0; iteration < num_iteration; ++iteration) {
-        if (copy_out) {
-            rc = system("sudo fstrim -a -v");
-        }
+//        if (copy_out) {
+//            rc = system("sudo fstrim -a -v");
+//        }
 
         db_location = db_location_copy;
         std::uniform_int_distribution<uint64_t > uniform_dist_file(0, (uint64_t) keys.size() - 1);
@@ -232,9 +232,9 @@ int main(int argc, char *argv[]) {
             // clear existing directory, clear page cache, trim SSD
             string command = "rm -rf " + db_location;
             rc = system(command.c_str());
-            rc = system("sudo fstrim -a -v");
-            rc = system("sync; echo 3 | sudo tee /proc/sys/vm/drop_caches");
-            cout << "delete and trim complete" << endl;
+//            rc = system("sudo fstrim -a -v");
+//            rc = system("sync; echo 3 | sudo tee /proc/sys/vm/drop_caches");
+//            cout << "delete and trim complete" << endl;
 
             status = DB::Open(options, db_location, &db);
             assert(status.ok() && "Open Error");
@@ -482,7 +482,7 @@ int main(int argc, char *argv[]) {
                 last_write = write_time;
                 detailed_times.clear();
                 start_new_event = true;
-                cout << (i + 1) / (num_operations / 10) << endl;
+                cout << "Progress:" << (i + 1) / (num_operations / 10) * 10 << "%" << endl;
                 Version* current = adgMod::db->versions_->current();
                 printf("LevelSize %d %d %d %d %d %d\n", current->NumFiles(0), current->NumFiles(1), current->NumFiles(2), current->NumFiles(3),
                        current->NumFiles(4), current->NumFiles(5));
@@ -493,7 +493,6 @@ int main(int argc, char *argv[]) {
 
 
         // report various data after the run
-
         instance->ReportTime();
         for (int s = 0; s < times.size(); ++s) {
             times[s].push_back(instance->ReportTime(s));

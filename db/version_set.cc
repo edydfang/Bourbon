@@ -403,16 +403,11 @@ namespace leveldb {
                     adgMod::LearnedIndexData *learned_this_level = learned_index_data_[level].get();
                     if (learned_this_level->Learned(this, adgMod::db->version_count, level)) {
                         //std::cout << "using model" << std::endl;
-
                         // use level model to get the target file
                         learned = true;
                         std::pair<uint64_t, uint64_t> bounds = learned_this_level->GetPosition(user_key);
 //                        size_t index;
                         if (bounds.first <= learned_this_level->MaxPosition()) {
-//                            learned_this_level->num_entries_accumulated.Search(user_key, bounds.first, bounds.second, &index, &position_lower, &position_upper);
-
-                            //printf("%lu %lu %lu\n", index, position_lower, position_upper);
-//
                             files = nullptr;
                             num_files = 0;
                             for (int i = bounds.first; i <= bounds.second && i<files_[level].size(); ++i) {
@@ -424,15 +419,6 @@ namespace leveldb {
                                     break;
                                 }
                             }
-//                            if (ucmp->Compare(file1->smallest.user_key(), user_key) <= 0) {
-//                                // predicted file may contain the target key
-//                                files = &files_[level][index];
-//                                num_files = 1;
-//                            } else {
-//                                // predicted file doesn't contain the target key (out of range)
-//                                files = nullptr;
-//                                num_files = 0;
-//                            }
                         } else {
                             // the model predicts a region larger than its size -- target key not in this level
                             files = nullptr;
