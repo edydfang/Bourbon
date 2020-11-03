@@ -128,7 +128,7 @@ namespace adgMod {
         bool Learned();
         bool Learned(Version* version, int v_count, int level);
         bool Learned(Version* version, int v_count, FileMetaData* meta, int level);
-        static void LevelLearn(void* arg);
+        static void LevelLearn(void* arg, bool no_lock=false);
         static uint64_t FileLearn(void* arg);
 
         // Load all the keys in the file/level
@@ -165,6 +165,15 @@ namespace adgMod {
         void Report();
         ~FileLearnedIndexData();
     };
+
+    class LevelLearnedIndexData {
+     private:
+      leveldb::port::Mutex mutex;
+      std::vector<LearnedIndexData*> level_learned_index_data;
+     public:
+
+    };
+
 
 }
 

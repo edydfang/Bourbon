@@ -90,7 +90,7 @@ bool LearnedIndexData::Learn() {
 
 // static learning function to be used with LevelDB background scheduling
 // level learning
-void LearnedIndexData::LevelLearn(void* arg) {
+void LearnedIndexData::LevelLearn(void* arg, bool nolock) {
   Stats* instance = Stats::GetInstance();
   bool success = false;
   bool entered = false;
@@ -100,8 +100,10 @@ void LearnedIndexData::LevelLearn(void* arg) {
   LearnedIndexData* self = vas->self;
   self->is_level = true;
   self->level = vas->level;
-
-  Version* c = db->GetCurrentVersion();
+  Version* c;
+  if (!nolock) {
+    c = db->GetCurrentVersion();
+  }
   if (db->version_count == vas->v_count) {
     entered = true;
     if (vas->version->FillLevel(adgMod::read_options, vas->level)) {
@@ -115,7 +117,9 @@ void LearnedIndexData::LevelLearn(void* arg) {
       }
     }
   }
-  adgMod::db->ReturnCurrentVersion(c);
+  if (!nolock) {
+    adgMod::db->ReturnCurrentVersion(c);
+  }
 
   auto time = instance->PauseTimer(8, true);
 
