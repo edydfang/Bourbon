@@ -1,3 +1,4 @@
+#include <cmath>
 #include <string>
 #include <vector>
 #include <deque>
@@ -15,6 +16,13 @@ struct point {
 struct line {
     double a;
     double b;
+
+    bool LineCheck() {
+        if (!std::isnan(a) && !std::isnan(b)) {
+            return true;
+        }
+        return false;
+    }
 };
 
 class Segment {
@@ -47,7 +55,7 @@ private:
     struct line rho_upper;
     struct point sint;
 
-    void setup();
+    bool setup();
     Segment current_segment();
     Segment process__(struct point pt, bool file);
 
