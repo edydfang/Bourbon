@@ -1,5 +1,6 @@
 ## A Learned Index for Log-Structured Merge Trees
 
+**Important** As the repo owner, I am not the author of the original Paper Author. Please reach out to the author *Yifan DAI* for any question regarding to the original code or paper, contact info can be found [here](https://pages.cs.wisc.edu/~yifann/).
 
 This repository contains code implementing the paper 
 [here](https://www.usenix.org/conference/osdi20/presentation/dai).
